@@ -4,8 +4,8 @@ from math import *
 from gmath import *
 import random
 
-def b_m_t(x0,y0,x1,y1,x2,y2):
-    pairs = {'x0':[x0,y0],'x1':[x1,y1],'x2':[x2,y2]}
+def b_m_t(x0,y0,z0,x1,y1,z1,x2,y2,z2):
+    pairs = {'x0':[x0,y0,z0],'x1':[x1,y1,z1],'x2':[x2,y2,z2]}
     themin = min(y0,y1,y2)
     themax = max(y0,y1,y2)
 
@@ -30,15 +30,15 @@ def b_m_t(x0,y0,x1,y1,x2,y2):
 def scanline_convert(polygons, i, screen, zbuffer):
     x0,y0,z0 = polygons[i][:3]
     x1,y1,z1 = polygons[i+1][:3]
-    x2,y2,z1 = polygons[i+2][:3]
+    x2,y2,z2 = polygons[i+2][:3]
     y0 = int(y0)
     y1 = int(y1)
     y2 = int(y2)
     color = [random.randint(0,255),random.randint(0,255),random.randint(0,255)]
+    bottom,middle,top = b_m_t(x0,y0,z0,x1,y1,z1,x2,y2,z2)
 
     dx1a = 1
     dx1b = 1
-    bottom,middle,top = b_m_t(x0,y0,x1,y1,x2,y2)
     dx0 = float(top[0]-bottom[0])/float(top[1]-bottom[1])
     if not middle[1]==bottom[1]:
         dx1a *= float(middle[0]-bottom[0])/float(middle[1]-bottom[1])
@@ -50,19 +50,37 @@ def scanline_convert(polygons, i, screen, zbuffer):
     else:
         dx1b = 0
 
+    dz0 = float(top[2]-bottom[2])/float(top[1]-bottom[1])
+    dz1a = 1
+    dz1b = 1
+    if not middle[1]==bottom[1]:
+        dz1a *= float(middle[2]-bottom[2])/float(middle[1]-bottom[1])
+    else:
+        dz1a = 0
+    if not top[1]==middle[1]:
+        dz1b *= float(top[2]-middle[2])/float(top[1]-middle[1])
+    else:
+        dz1b = 0
+
     mx0 = float(bottom[0])
     mx1 = float(bottom[0])
+    mz0 = float(bottom[2])
+    mz1 = float(bottom[2])
     if dx1a==0: # not sure why this fixes, but it does
         mx1 = float(middle[0])
+    if dz1a==0:
+        mz1 = float(middle[2])
 
     for y in range(bottom[1],top[1]+1):
-        draw_line(int(mx0),y,0,int(mx1),y,0,screen,zbuffer,color)
+        draw_line(int(mx0),y,mz0,int(mx1),y,mz1,screen,zbuffer,color)
         mx0 += dx0
+        mz0 += dz0
         if y>=middle[1]:
             mx1 += dx1b
+            mz1 += dz1b
         else:
             mx1 += dx1a
-
+            mz1 += dz1b
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point(polygons, x0, y0, z0);
@@ -306,9 +324,6 @@ def add_edge( matrix, x0, y0, z0, x1, y1, z1 ):
     
 def add_point( matrix, x, y, z=0 ):
     matrix.append( [x, y, z, 1] )
-    
-
-
 
 def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
 
