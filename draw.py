@@ -2,10 +2,66 @@ from display import *
 from matrix import *
 from math import *
 from gmath import *
+import random
 
+def b_m_t(x0,y0,x1,y1,x2,y2):
+    pairs = {'x0':[x0,y0],'x1':[x1,y1],'x2':[x2,y2]}
+    themin = min(y0,y1,y2)
+    themax = max(y0,y1,y2)
+
+    if themin==y0:
+        bottom = pairs.pop('x0')
+    elif themin==y1:
+        bottom = pairs.pop('x1')
+    else:
+        bottom = pairs.pop('x2')
+
+    if themax==y0:
+        top = pairs.pop('x0')
+    elif themax==y1:
+        top = pairs.pop('x1')
+    else:
+        top = pairs.pop('x2')
+
+    middle = pairs.values()[0]
+
+    return [bottom,middle,top]
 
 def scanline_convert(polygons, i, screen, zbuffer):
-    pass
+    x0,y0,z0 = polygons[i][:3]
+    x1,y1,z1 = polygons[i+1][:3]
+    x2,y2,z1 = polygons[i+2][:3]
+    y0 = int(y0)
+    y1 = int(y1)
+    y2 = int(y2)
+    color = [random.randint(0,255),random.randint(0,255),random.randint(0,255)]
+
+    dx1a = 1
+    dx1b = 1
+    bottom,middle,top = b_m_t(x0,y0,x1,y1,x2,y2)
+    dx0 = float(top[0]-bottom[0])/float(top[1]-bottom[1])
+    if not middle[1]==bottom[1]:
+        dx1a *= float(middle[0]-bottom[0])/float(middle[1]-bottom[1])
+    else:
+        dx1a = 0
+
+    if not top[1]==middle[1]:
+        dx1b *= float(top[0]-middle[0])/float(top[1]-middle[1])
+    else:
+        dx1b = 0
+
+    mx0 = float(bottom[0])
+    mx1 = float(bottom[0])
+    if dx1a==0: # not sure why this fixes, but it does
+        mx1 = float(middle[0])
+
+    for y in range(bottom[1],top[1]+1):
+        draw_line(int(mx0),y,0,int(mx1),y,0,screen,zbuffer,color)
+        mx0 += dx0
+        if y>=middle[1]:
+            mx1 += dx1b
+        else:
+            mx1 += dx1a
 
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
@@ -24,7 +80,7 @@ def draw_polygons( matrix, screen, zbuffer, color ):
         normal = calculate_normal(matrix, point)[:]
         #print normal
         if normal[2] > 0:
-            #scanline_convert(matrix, point, screen, zbuffer)            
+            scanline_convert(matrix, point, screen, zbuffer)            
             draw_line( int(matrix[point][0]),
                        int(matrix[point][1]),
                        matrix[point][2],
