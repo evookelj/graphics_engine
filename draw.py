@@ -9,6 +9,9 @@ def b_m_t(x0,y0,z0,x1,y1,z1,x2,y2,z2):
     themin = min(y0,y1,y2)
     themax = max(y0,y1,y2)
 
+    if themin==themax:
+        return ['bad','bad','bad']
+
     if themin==y0:
         bottom = pairs.pop('x0')
     elif themin==y1:
@@ -36,6 +39,9 @@ def scanline_convert(polygons, i, screen, zbuffer):
     y2 = int(y2)
     color = [random.randint(0,255),random.randint(0,255),random.randint(0,255)]
     bottom,middle,top = b_m_t(x0,y0,z0,x1,y1,z1,x2,y2,z2)
+
+    if bottom=='bad':
+        return
 
     dx1a = 1
     dx1b = 1
@@ -384,6 +390,9 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
             loop_start = y1
             loop_end = y
 
+    if not loop_end==loop_start:
+        dz = (z1-z)/(loop_end-loop_start)
+
     while ( loop_start < loop_end ):
         plot( screen, zbuffer, color, x, y, z )
         if ( (wide and ((A > 0 and d > 0) or (A < 0 and d < 0))) or
@@ -395,6 +404,7 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
             x+= dx_east
             y+= dy_east
             d+= d_east
+        z+=dz
         loop_start+= 1
 
     plot( screen, zbuffer, color, x, y, z )
