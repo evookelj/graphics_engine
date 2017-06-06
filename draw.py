@@ -88,6 +88,20 @@ def scanline_convert(polygons, i, screen, zbuffer):
             mx1 += dx1a
             mz1 += dz1b
 
+def normalize(v):
+    return sqrt(v[0]**2 + v[1]**2 + v[2]**2)
+
+def get_light(i,a,ka,l,kd,ks):
+    return get_ambient(a,ka) + get_diffuse(l,kd)# + get_specular(i,ks)
+
+def get_ambient(a, ka):
+    return [min(255,i*ka) for i in a]
+
+def get_diffuse(l,kd):
+    src = normalize(l[0])
+    clr = l[1]
+    return [i*kd for i in a]
+
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point(polygons, x0, y0, z0);
     add_point(polygons, x1, y1, z1);

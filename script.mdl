@@ -3,7 +3,7 @@ basename simple
 push 
 move 250 250 0
 push
-scale 2 2 0 bigenator
+scale 2 2 0g bigenator
 // rotate y 360 spinny
 sphere 0 0 0 100
 pop
