@@ -43,28 +43,24 @@ def scanline_convert(polygons, i, screen, zbuffer):
     if bottom=='bad':
         return
 
-    dx1a = 1
-    dx1b = 1
     dx0 = float(top[0]-bottom[0])/float(top[1]-bottom[1])
     if not middle[1]==bottom[1]:
-        dx1a *= float(middle[0]-bottom[0])/float(middle[1]-bottom[1])
+        dx1a = float(middle[0]-bottom[0])/float(middle[1]-bottom[1])
     else:
         dx1a = 0
 
     if not top[1]==middle[1]:
-        dx1b *= float(top[0]-middle[0])/float(top[1]-middle[1])
+        dx1b = float(top[0]-middle[0])/float(top[1]-middle[1])
     else:
         dx1b = 0
 
     dz0 = float(top[2]-bottom[2])/float(top[1]-bottom[1])
-    dz1a = 1
-    dz1b = 1
     if not middle[1]==bottom[1]:
-        dz1a *= float(middle[2]-bottom[2])/float(middle[1]-bottom[1])
+        dz1a = float(middle[2]-bottom[2])/float(middle[1]-bottom[1])
     else:
         dz1a = 0
     if not top[1]==middle[1]:
-        dz1b *= float(top[2]-middle[2])/float(top[1]-middle[1])
+        dz1b = float(top[2]-middle[2])/float(top[1]-middle[1])
     else:
         dz1b = 0
 
